@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  FlatList,
 } from "react-native";
 import React, { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
@@ -44,6 +45,7 @@ export default function Home() {
       titleOfGallery: imageTitle,
     };
     addImages(data);
+    setImages([]);
   };
 
   if (loading === true) {
@@ -53,74 +55,86 @@ export default function Home() {
       </View>
     );
   }
-  if (error) {
-    console.log(error);
-  }
-
-  if (success) {
-    console.log("Success", success);
-  }
-  console.log(gallery.images);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Home</Text>
-      <TextInput
-        value={imageTitle}
-        onChangeText={(text) => setImageTitle(text)}
-        style={{
-          width: 150,
-          borderColor: "black",
-          borderWidth: 2,
-          padding: 10,
-          marginRight: 4,
-          marginLeft: 4,
-        }}
-        placeholder="Enter image title"
-      />
-      <TouchableOpacity
-        style={{
-          borderColor: "black",
-          borderWidth: 2,
-          borderRadius: 15,
-          padding: 10,
-          marginTop: 20,
-        }}
-        onPress={handleImageSelect}
-      >
-        <Text>Add Images</Text>
-      </TouchableOpacity>
+    <FlatList
+      ListHeaderComponent={() => (
+        <View style={[styles.container, { marginTop: 50 }]}>
+          <Text style={styles.heading}>Home</Text>
+          <TextInput
+            value={imageTitle}
+            onChangeText={(text) => setImageTitle(text)}
+            style={{
+              width: 150,
+              borderColor: "black",
+              borderWidth: 2,
+              padding: 10,
+              marginRight: 4,
+              marginLeft: 4,
+            }}
+            placeholder="Enter image title"
+          />
+          {images.length === 0 ? (
+            <TouchableOpacity
+              style={{
+                borderColor: "black",
+                borderWidth: 2,
+                borderRadius: 15,
+                padding: 10,
+                marginTop: 20,
+              }}
+              onPress={handleImageSelect}
+            >
+              <Text>Add Images</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={{
+                borderColor: "black",
+                borderWidth: 2,
+                borderRadius: 15,
+                padding: 10,
+                marginTop: 20,
+              }}
+              onPress={handleImageSelect}
+            >
+              <Text>Change Images</Text>
+            </TouchableOpacity>
+          )}
 
-      <TouchableOpacity
-        style={{
-          borderColor: "black",
-          borderWidth: 2,
-          borderRadius: 15,
-          padding: 10,
-          marginTop: 20,
-        }}
-        onPress={submitHandler}
-      >
-        <Text>Upload</Text>
-      </TouchableOpacity>
-
-      {gallery &&
-        gallery.map((item) => (
-          <View key={item._id}>
-            {gallery.images &&
-              gallery.images?.map((image) => (
-                <Image
-                  source={{ uri: image.url }}
-                  key={image.url}
-                  style={{
-                    width: 100,
-                    height: 100,
-                  }}
-                />
-              ))}
-          </View>
-        ))}
-    </View>
+          <TouchableOpacity
+            style={{
+              borderColor: "black",
+              borderWidth: 2,
+              borderRadius: 15,
+              padding: 10,
+              marginTop: 20,
+            }}
+            onPress={submitHandler}
+          >
+            <Text>Upload</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      data={gallery}
+      keyExtractor={(item) => item._id}
+      renderItem={({ item }) => (
+        <View style={[styles.container, { marginTop: 10 }]}>
+          {item.images.map((image) => (
+            <Image
+              key={image.public_id}
+              source={{ uri: image.url }}
+              style={{ width: 200, height: 200 }}
+            />
+          ))}
+        </View>
+      )}
+      ListEmptyComponent={() => (
+        <View style={styles.container}>
+          <Text>No images to display</Text>
+        </View>
+      )}
+    />
   );
 }
 

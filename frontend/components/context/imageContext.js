@@ -71,7 +71,7 @@ export const ImageProvider = ({ children }) => {
 
   useEffect(() => {
     getGallery();
-  }, []);
+  }, [addImages]);
 
   return (
     <ImageContext.Provider value={{ ...state, addImages, clearError }}>
