@@ -4,13 +4,13 @@ import cloudinary from "cloudinary";
 export const uploadImages = async (req, res, next) => {
   let images = [];
 
-  if (typeof req.body.photos === "string") {
-    images.push(req.body.photos);
+  if (typeof req.body.images === "string") {
+    images.push(req.body.images);
   } else {
-    images = req.body.photos;
+    images = req.body.images;
   }
 
-  if (!req.body.titleOfGallery) {
+  if (!req.body.title) {
     res.status(500).json({
       success: false,
       message: "Please add title",
@@ -20,16 +20,9 @@ export const uploadImages = async (req, res, next) => {
   const imageLinks = [];
 
   for (let i = 0; i < images.length; i++) {
-    const result = await cloudinary.v2.uploader
-      .upload(images[i], {
-        folder: "gallery",
-      })
-      .catch((err) => {
-        res.status(500).json({
-          success: false,
-          message: `Cloudinary Err: ${err.message}`,
-        });
-      });
+    const result = await cloudinary.v2.uploader.upload(images[i], {
+      folder: "gallery",
+    });
     imageLinks.push({
       public_id: result.public_id,
       url: result.secure_url,
@@ -37,7 +30,7 @@ export const uploadImages = async (req, res, next) => {
   }
 
   const imageGallery = await ImageGallery.create({
-    ...req.body,
+    titleOfGallery: req.body.title,
     images: imageLinks,
   });
 
